@@ -1,32 +1,67 @@
 import type { AppConfig } from "../types.js";
 
-export const DEFAULT_AUTHORS = ["maximunited", "ugreener", "gamado"] as const;
+export const DEFAULT_AUTHORS = [
+  "mshitrit",
+  "razo7",
+  "mpryc",
+  "slintes",
+  "clobrano",
+  "weshayutin",
+  "JonahSussman",
+  "eemcmullan",
+  "pranavgaikwad",
+  "ugreener",
+  "gamado",
+  "beekhof",
+  "rbartal",
+  "abrugaro",
+  "jmontleon",
+  "mhabashrh",
+  "lyfofvipin",
+  "swgoswam",
+  "frajamomo",
+] as const;
 
 export const DEFAULT_CONFIG: AppConfig = {
   repos: [
     {
-      repo: "medik8s/system-tests",
-      ciPatterns: {
-        e2e: ["pj-rehearse*", "*e2e*"],
-        ignore: [],
-      },
+      repo: "medik8s/fence-agents-remediation",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
     },
     {
-      repo: "openshift/release",
-      ciPatterns: {
-        e2e: ["pj-rehearse*", "*rehearse*"],
-        ignore: [],
-      },
+      repo: "medik8s/self-node-remediation",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
+    {
+      repo: "medik8s/node-healthcheck-operator",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
+    {
+      repo: "medik8s/machine-deletion-remediation",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
+    {
+      repo: "medik8s/node-maintenance-operator",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
     },
     {
       repo: "medik8s/storage-based-remediation",
-      ciPatterns: {
-        e2e: ["pj-rehearse*", "*e2e*"],
-        ignore: [],
-      },
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
+    {
+      repo: "medik8s/common",
+      ciPatterns: { e2e: ["pj-rehearse*"], ignore: [] },
+    },
+    {
+      repo: "medik8s/system-tests",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
+    {
+      repo: "openshift/release",
+      ciPatterns: { e2e: ["pj-rehearse*", "*rehearse*"], ignore: [] },
     },
   ],
-  cacheTtl: Number(process.env["CACHE_TTL"] ?? 1800),
+  cacheTtl: Number(process.env["CACHE_TTL"] ?? 300),
 };
 
 // Pattern-matched so we handle org-specific bot names (e.g. qodo-2-for-medik8s)
