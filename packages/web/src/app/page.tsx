@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { DEFAULT_AUTHORS, DEFAULT_CONFIG } from "@pr-radar/core/config/default";
 import { PrTable } from "@/components/PrTable";
 import type { FetchResult } from "@/lib/types";
@@ -17,8 +17,11 @@ export default function Home() {
   const [loadingAuthors, setLoadingAuthors] = useState<Set<string>>(new Set());
   const [loadedRepos, setLoadedRepos] = useState<Set<string>>(new Set(DEFAULT_REPOS));
   const [loadingRepos, setLoadingRepos] = useState<Set<string>>(new Set());
+  const loadingRef = useRef(false);
 
   const load = useCallback(async (force = false) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     setRefreshing(true);
     setError(null);
     try {
@@ -38,6 +41,7 @@ export default function Home() {
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
+      loadingRef.current = false;
       setRefreshing(false);
     }
   }, []);
@@ -84,7 +88,9 @@ export default function Home() {
 
   useEffect(() => {
     void load();
-    const id = setInterval(() => void load(), POLL_MS);
+    const id = setInterval(() => {
+      if (document.visibilityState === "visible") void load();
+    }, POLL_MS);
     return () => clearInterval(id);
   }, [load]);
 
