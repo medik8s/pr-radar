@@ -1,15 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { DEFAULT_AUTHORS, DEFAULT_CONFIG } from "@pr-radar/core/config/default";
 import { PrTable } from "@/components/PrTable";
 import type { FetchResult } from "@/lib/types";
 
-const DEFAULT_AUTHORS = ["maximunited", "ugreener", "gamado"];
-const DEFAULT_REPOS = [
-  "medik8s/system-tests",
-  "openshift/release",
-  "medik8s/storage-based-remediation",
-];
+const DEFAULT_REPOS = DEFAULT_CONFIG.repos.map(({ repo }) => repo);
 const POLL_MS = 15 * 60 * 1000;
 
 export default function Home() {

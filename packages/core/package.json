@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./config/default": "./src/config/default.ts"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
