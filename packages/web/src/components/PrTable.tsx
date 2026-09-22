@@ -584,7 +584,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
-                    style={{ width: header.column.getSize() }}
+                    style={{ width: header.column.getSize(), minWidth: header.column.getSize() }}
                     className="px-3 py-2.5 text-left text-xs font-medium text-text-secondary uppercase tracking-wider select-none"
                     onClick={header.column.getToggleSortingHandler()}
                   >
@@ -615,7 +615,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                 )}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-2 align-middle" style={{ width: cell.column.getSize() }}>
+                  <td key={cell.id} className="px-3 py-2 align-middle" style={{ width: cell.column.getSize(), minWidth: cell.column.getSize() }}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
