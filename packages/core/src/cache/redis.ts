@@ -9,6 +9,7 @@ interface CacheEntry {
 
 const memCache = new Map<string, CacheEntry>();
 const revalidating = new Set<string>();
+export const OPEN_PRS_CACHE_KEY = "__all_open__";
 
 let client: Redis | null = null;
 
