@@ -12,7 +12,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function CiDots({ jobs }: { jobs: CiJob[] }) {
   if (jobs.length === 0) return <span className="text-text-muted text-xs">—</span>;
   return (
-    <span className="flex flex-wrap gap-1">
+    <span className="inline-flex flex-wrap gap-1">
       {jobs.map((job) => (
         <a
           key={job.name}

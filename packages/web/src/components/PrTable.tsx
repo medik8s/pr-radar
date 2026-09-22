@@ -577,7 +577,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
 
       {/* Table */}
       <div className="overflow-auto rounded-lg border border-border bg-bg-card">
-        <table className="w-full text-sm">
+        <table className="text-sm" style={{ minWidth: 1300 }}>
           <thead className="sticky top-0 bg-bg-table-header">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
