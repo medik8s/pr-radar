@@ -387,7 +387,10 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
     <div className="flex h-full flex-col gap-3 p-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-lg font-semibold tracking-tight text-text-heading">PR Radar</span>
+        <span className="flex items-center gap-2">
+          <img src="/medik8s-logo.png" alt="medik8s" className="h-8 w-auto" />
+          <span className="text-lg font-semibold tracking-tight text-text-heading">medik8s PR Radar</span>
+        </span>
 
         {/* Smart filters */}
         <div className="flex gap-1">

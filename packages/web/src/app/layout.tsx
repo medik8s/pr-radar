@@ -3,7 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PR Radar",
+  title: "medik8s PR Radar",
   description: "Open PR dashboard for medik8s and OpenShift",
 };
 
