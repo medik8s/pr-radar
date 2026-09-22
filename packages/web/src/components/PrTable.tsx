@@ -88,7 +88,7 @@ const COLUMNS = [
   col.accessor("state", {
     header: "State",
     cell: (i) => (
-      <span className={clsx("rounded px-1.5 py-0.5 text-xs font-medium", STATE_BADGE[i.getValue()])}>
+      <span className={clsx("inline-flex items-center justify-center rounded px-2 py-1 text-xs font-medium leading-none", STATE_BADGE[i.getValue()])}>
         {i.getValue()}
       </span>
     ),
