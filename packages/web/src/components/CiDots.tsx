@@ -2,15 +2,15 @@
 import type { CiJob } from "@/lib/types";
 
 const STATUS_COLORS: Record<string, string> = {
-  success: "bg-green-500",
-  failure: "bg-red-500",
-  pending: "bg-yellow-400",
-  skipped: "bg-gray-500",
-  missing: "bg-gray-700",
+  success: "bg-status-success",
+  failure: "bg-status-error",
+  pending: "bg-status-warning",
+  skipped: "bg-text-muted",
+  missing: "bg-border",
 };
 
 export function CiDots({ jobs }: { jobs: CiJob[] }) {
-  if (jobs.length === 0) return <span className="text-gray-600 text-xs">—</span>;
+  if (jobs.length === 0) return <span className="text-text-muted text-xs">—</span>;
   return (
     <span className="flex flex-wrap gap-1">
       {jobs.map((job) => (
@@ -20,7 +20,7 @@ export function CiDots({ jobs }: { jobs: CiJob[] }) {
           target="_blank"
           rel="noreferrer"
           title={job.name}
-          className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLORS[job.status] ?? "bg-gray-600"}`}
+          className={`inline-block h-2.5 w-2.5 rounded-full ${STATUS_COLORS[job.status] ?? "bg-text-muted"}`}
         />
       ))}
     </span>
@@ -28,14 +28,14 @@ export function CiDots({ jobs }: { jobs: CiJob[] }) {
 }
 
 export function E2eDot({ job }: { job: CiJob | null }) {
-  if (!job) return <span className="text-gray-600 text-xs">—</span>;
+  if (!job) return <span className="text-text-muted text-xs">—</span>;
   return (
     <a
       href={job.url ?? undefined}
       target="_blank"
       rel="noreferrer"
       title={job.name}
-      className={`inline-block h-3 w-3 rounded-full ${STATUS_COLORS[job.status] ?? "bg-gray-600"}`}
+      className={`inline-block h-3 w-3 rounded-full ${STATUS_COLORS[job.status] ?? "bg-text-muted"}`}
     />
   );
 }
