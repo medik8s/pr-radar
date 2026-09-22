@@ -19,6 +19,8 @@ export const DEFAULT_AUTHORS = [
   "mhabashrh",
   "lyfofvipin",
   "swgoswam",
+  "Tzif-Morgen",
+  "maximunited",
   "frajamomo",
 ] as const;
 
