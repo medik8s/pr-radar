@@ -27,27 +27,27 @@ const DEFAULT_REPO_FILTER = ALL_DEFAULT_REPOS;
 function removedLabelClasses(label: string): string {
   const l = label.toLowerCase();
   if (/^(lgtm|approved|cherry-pick-approved|ok-to-test)$/.test(l))
-    return "border border-green-600 text-gray-500";
+    return "border border-[rgba(34,197,94,0.3)] text-text-muted";
   if (/^(hold|do-not-merge|needs-rebase|wip)$/.test(l) || /^do-not-merge\//.test(l))
-    return "border border-red-600 text-gray-500";
+    return "border border-[rgba(239,68,68,0.3)] text-text-muted";
   if (/^size\//.test(l) || /^(needs-ok-to-test|needs-priority|needs-kind)$/.test(l))
-    return "border border-blue-600 text-gray-500";
-  return "border border-purple-600 text-gray-500";
+    return "border border-[rgba(59,130,246,0.3)] text-text-muted";
+  return "border border-[rgba(168,85,247,0.3)] text-text-muted";
 }
 
 function labelClasses(label: string): string {
   const l = label.toLowerCase();
   // Green: approval / positive signals
   if (/^(lgtm|approved|cherry-pick-approved|ok-to-test)$/.test(l))
-    return "bg-green-900/70 text-green-300";
+    return "bg-status-success-bg text-status-success border border-[rgba(34,197,94,0.25)]";
   // Red: hard blockers
   if (/^(hold|do-not-merge|needs-rebase|wip)$/.test(l) || /^do-not-merge\//.test(l))
-    return "bg-red-900/70 text-red-300";
+    return "bg-status-error-bg text-status-error border border-[rgba(239,68,68,0.25)]";
   // Blue: size tiers and CI-gate labels
   if (/^size\//.test(l) || /^(needs-ok-to-test|needs-priority|needs-kind)$/.test(l))
-    return "bg-blue-900/70 text-blue-300";
+    return "bg-status-info-bg text-status-info border border-[rgba(59,130,246,0.25)]";
   // Default: purple for area, kind, priority, and anything else
-  return "bg-purple-900/70 text-purple-300";
+  return "bg-status-neutral-bg text-status-neutral border border-[rgba(168,85,247,0.25)]";
 }
 
 function abbreviateRepo(full: string): string {
@@ -63,9 +63,9 @@ function abbreviateRepo(full: string): string {
 }
 
 const STATE_BADGE: Record<PrState, string> = {
-  open: "bg-green-700 text-green-200",
-  draft: "bg-gray-700 text-gray-300",
-  closed: "bg-purple-900 text-purple-300",
+  open: "bg-status-success-bg text-status-success border border-[rgba(34,197,94,0.25)]",
+  draft: "bg-bg-hover text-text-secondary border border-border",
+  closed: "bg-status-neutral-bg text-status-neutral border border-[rgba(168,85,247,0.25)]",
 };
 
 const COLUMN_TIPS: Record<string, string> = {
@@ -101,7 +101,7 @@ const COLUMNS = [
         href={`https://github.com/${i.getValue()}`}
         target="_blank"
         rel="noreferrer"
-        className="text-gray-300 hover:text-white hover:underline text-xs"
+        className="text-text-secondary hover:text-text-heading hover:underline text-xs"
       >
         {i.getValue()}
       </a>
@@ -118,7 +118,7 @@ const COLUMNS = [
           target="_blank"
           rel="noreferrer"
           title={full}
-          className="text-xs text-gray-400 hover:text-gray-200 hover:underline"
+          className="text-xs text-text-muted hover:text-text-primary hover:underline"
         >
           {abbreviateRepo(full)}
         </a>
@@ -129,7 +129,7 @@ const COLUMNS = [
   col.accessor("number", {
     header: "PR",
     cell: (i) => (
-      <a href={i.row.original.url} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">
+      <a href={i.row.original.url} target="_blank" rel="noreferrer" className="text-accent hover:underline">
         #{i.getValue()}
       </a>
     ),
@@ -138,7 +138,7 @@ const COLUMNS = [
   col.accessor("title", {
     header: "Title",
     cell: (i) => (
-      <a href={i.row.original.url} target="_blank" rel="noreferrer" className="line-clamp-1 hover:underline">
+      <a href={i.row.original.url} target="_blank" rel="noreferrer" className="line-clamp-1 hover:underline text-text-primary">
         {i.getValue()}
       </a>
     ),
@@ -173,7 +173,7 @@ const COLUMNS = [
     cell: (i) => {
       const { unresolved, total, unrepliedComments, allReplied } = i.getValue();
       const hasAny = unresolved > 0 || unrepliedComments > 0;
-      const color = allReplied && !unrepliedComments ? "text-green-400" : hasAny ? "text-yellow-400" : "text-gray-500";
+      const color = allReplied && !unrepliedComments ? "text-status-success" : hasAny ? "text-status-warning" : "text-text-muted";
       const parts: string[] = [];
       if (unrepliedComments > 0) parts.push(`${unrepliedComments} unreplied`);
       if (total > 0) parts.push(`${unresolved}/${total} inline unresolved`);
@@ -211,9 +211,9 @@ const COLUMNS = [
       }).join("\n");
       return (
         <span title={tooltip || undefined} className="flex gap-1 text-xs cursor-default">
-          {approved > 0 && <span className="text-green-400">✓{approved}</span>}
-          {changesRequested > 0 && <span className="text-red-400">✗{changesRequested}</span>}
-          {approved === 0 && changesRequested === 0 && <span className="text-gray-600">—</span>}
+          {approved > 0 && <span className="text-status-success">✓{approved}</span>}
+          {changesRequested > 0 && <span className="text-status-error">✗{changesRequested}</span>}
+          {approved === 0 && changesRequested === 0 && <span className="text-text-muted">—</span>}
         </span>
       );
     },
@@ -387,7 +387,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
     <div className="flex h-full flex-col gap-3 p-4">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-3">
-        <span className="text-lg font-semibold tracking-tight">PR Radar</span>
+        <span className="text-lg font-semibold tracking-tight text-text-heading">PR Radar</span>
 
         {/* Smart filters */}
         <div className="flex gap-1">
@@ -396,8 +396,8 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
               key={f}
               onClick={() => setSmartFilter(f)}
               className={clsx(
-                "rounded px-2 py-1 text-xs font-medium transition-colors",
-                smartFilter === f ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-400 hover:bg-gray-700",
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                smartFilter === f ? "bg-accent text-white" : "bg-bg-surface text-text-secondary border border-border hover:bg-bg-hover hover:text-text-primary",
               )}
             >
               {f === "all" ? "All" : f === "needs_attention" ? "Needs attention" : "Ready to merge"}
@@ -409,26 +409,26 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
         <div className="relative" ref={stateDropdownRef}>
           <button
             onClick={() => setStateDropdownOpen((o) => !o)}
-            className="flex items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-gray-300 hover:bg-gray-700"
+            className="flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-xs text-text-secondary border border-border hover:bg-bg-hover"
           >
             States
-            <span className="rounded-full bg-blue-700 px-1 text-white">
+            <span className="rounded-full bg-accent px-1.5 text-white text-[10px]">
               {stateFilter.length === 0 ? "all" : stateFilter.length}
             </span>
           </button>
           {stateDropdownOpen && (
-            <div className="absolute left-0 top-full z-20 mt-1 min-w-[130px] rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-xl">
+            <div className="absolute left-0 top-full z-20 mt-1 min-w-[130px] rounded-lg border border-border bg-bg-card py-1 shadow-xl">
               <button
                 onClick={() => setStateFilter([])}
-                className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
                 Show all
               </button>
-              <div className="my-1 border-t border-gray-800" />
+              <div className="my-1 border-t border-border" />
               {(["open", "draft", "closed"] as PrState[]).map((s) => {
                 const selected = stateFilter.includes(s);
                 return (
-                  <label key={s} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-gray-800">
+                  <label key={s} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-bg-hover">
                     <input
                       type="checkbox"
                       checked={selected}
@@ -439,7 +439,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                       }
                       className="accent-blue-500"
                     />
-                    <span className={clsx("text-xs capitalize", selected ? "text-white" : "text-gray-500")}>{s}</span>
+                    <span className={clsx("text-xs capitalize", selected ? "text-text-heading" : "text-text-muted")}>{s}</span>
                   </label>
                 );
               })}
@@ -451,44 +451,44 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
         <div className="relative" ref={repoDropdownRef}>
           <button
             onClick={() => setRepoDropdownOpen((o) => !o)}
-            className="flex items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-gray-300 hover:bg-gray-700"
+            className="flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-xs text-text-secondary border border-border hover:bg-bg-hover"
           >
             Repos
-            <span className="rounded-full bg-blue-700 px-1 text-white">
+            <span className="rounded-full bg-accent px-1.5 text-white text-[10px]">
               {repoFilter.length === 0 ? "all" : repoFilter.length}
             </span>
           </button>
           {repoDropdownOpen && (
-            <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-xl">
-              <div className="flex items-center gap-1 border-b border-gray-800 px-2 pb-1">
+            <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-border bg-bg-card py-1 shadow-xl">
+              <div className="flex items-center gap-1 border-b border-border px-2 pb-1">
                 <input
                   type="text"
                   value={repoInput}
                   onChange={(e) => setRepoInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") addRepoFromInput(); }}
                   placeholder="Add org/repo…"
-                  className="w-full bg-transparent py-1 text-xs text-gray-300 placeholder-gray-600 outline-none"
+                   className="w-full bg-transparent py-1 text-xs text-text-primary placeholder-text-muted outline-none"
                 />
-                <button onClick={addRepoFromInput} className="text-gray-500 hover:text-gray-300 text-xs">+</button>
+                <button onClick={addRepoFromInput} className="text-text-muted hover:text-text-primary text-xs">+</button>
               </div>
               <button
                 onClick={() => setRepoFilter([])}
-                className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
                 Show all
               </button>
               <button
                 onClick={() => setRepoFilter([...DEFAULT_REPO_FILTER])}
-                className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
                 Reset to defaults
               </button>
-              <div className="my-1 border-t border-gray-800" />
+              <div className="my-1 border-t border-border" />
               {Array.from(new Set([...ALL_DEFAULT_REPOS, ...repos, ...repoFilter])).sort().map((r) => {
                 const selected = repoFilter.includes(r);
                 const loading = loadingRepos.has(r);
                 return (
-                  <label key={r} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-gray-800">
+                  <label key={r} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-bg-hover">
                     <input
                       type="checkbox"
                       checked={selected}
@@ -499,10 +499,10 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                       }
                       className="accent-blue-500"
                     />
-                    <span className={clsx("text-xs flex-1", selected ? "text-white" : "text-gray-500")} title={r}>
+                    <span className={clsx("text-xs flex-1", selected ? "text-text-heading" : "text-text-muted")} title={r}>
                       {abbreviateRepo(r)}
                     </span>
-                    {loading && <span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-yellow-400 border-t-transparent" />}
+                    {loading && <span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-status-warning border-t-transparent" />}
                   </label>
                 );
               })}
@@ -514,33 +514,33 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
         <div className="relative" ref={authorDropdownRef}>
           <button
             onClick={() => setAuthorDropdownOpen((o) => !o)}
-            className="flex items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-gray-300 hover:bg-gray-700"
+            className="flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-xs text-text-secondary border border-border hover:bg-bg-hover"
           >
             Authors
-            <span className="rounded-full bg-blue-700 px-1 text-white">
+            <span className="rounded-full bg-accent px-1.5 text-white text-[10px]">
               {authorFilter.length === 0 ? "all" : authorFilter.length}
             </span>
           </button>
           {authorDropdownOpen && (
-            <div className="absolute left-0 top-full z-20 mt-1 min-w-[180px] rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-xl">
+            <div className="absolute left-0 top-full z-20 mt-1 min-w-[180px] rounded-lg border border-border bg-bg-card py-1 shadow-xl">
               <button
                 onClick={() => setAuthorFilter([])}
-                className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
                 Show all
               </button>
               <button
                 onClick={() => setAuthorFilter([...DEFAULT_AUTHORS])}
-                className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
                 Reset to defaults
               </button>
-              <div className="my-1 border-t border-gray-800" />
+              <div className="my-1 border-t border-border" />
               {DEFAULT_AUTHORS.toSorted().map((a) => {
                 const selected = authorFilter.includes(a);
                 const loading = loadingAuthors.has(a);
                 return (
-                  <label key={a} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-gray-800">
+                  <label key={a} className="flex cursor-pointer items-center gap-2 px-3 py-1 hover:bg-bg-hover">
                     <input
                       type="checkbox"
                       checked={selected}
@@ -551,8 +551,8 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                       }
                       className="accent-blue-500"
                     />
-                    <span className={clsx("text-xs flex-1", selected ? "text-white" : "text-gray-500")}>{a}</span>
-                    {loading && <span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-yellow-400 border-t-transparent" />}
+                    <span className={clsx("text-xs flex-1", selected ? "text-text-heading" : "text-text-muted")}>{a}</span>
+                    {loading && <span className="inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-status-warning border-t-transparent" />}
                   </label>
                 );
               })}
@@ -560,7 +560,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
           )}
         </div>
 
-        <span className="ml-auto text-xs text-gray-600">
+        <span className="ml-auto text-xs text-text-muted">
           {filtered.length} PRs
           {lastFetched && ` · fetched ${new Date(lastFetched).toLocaleTimeString()}`}
         </span>
@@ -568,7 +568,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="flex items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-gray-400 hover:bg-gray-700 disabled:opacity-50"
+          className="flex items-center gap-1 rounded-md bg-bg-surface px-2 py-1 text-xs text-text-secondary border border-border hover:bg-bg-hover disabled:opacity-50"
         >
           <RefreshCw size={12} className={refreshing ? "animate-spin" : ""} />
           Refresh
@@ -576,16 +576,16 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
       </div>
 
       {/* Table */}
-      <div className="overflow-auto rounded-lg border border-gray-800">
+      <div className="overflow-auto rounded-lg border border-border bg-bg-card">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-gray-900">
+          <thead className="sticky top-0 bg-bg-table-header">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
                     style={{ width: header.column.getSize() }}
-                    className="px-3 py-2 text-left text-xs font-medium text-gray-500 select-none"
+                    className="px-3 py-2.5 text-left text-xs font-medium text-text-secondary uppercase tracking-wider select-none"
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     <span
@@ -609,9 +609,9 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
               <tr
                 key={row.id}
                 className={clsx(
-                  "border-t border-gray-800",
-                  i % 2 === 0 ? "bg-gray-950" : "bg-gray-900/40",
-                  "hover:bg-gray-800/60",
+                  "border-t border-border",
+                  i % 2 === 0 ? "bg-bg-card" : "bg-bg-surface",
+                  "hover:bg-bg-hover transition-colors",
                 )}
               >
                 {row.getVisibleCells().map((cell) => (
@@ -624,7 +624,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
           </tbody>
         </table>
         {filtered.length === 0 && (
-          <div className="py-16 text-center text-sm text-gray-600">No PRs match the current filters.</div>
+          <div className="py-16 text-center text-sm text-text-muted">No PRs match the current filters.</div>
         )}
       </div>
     </div>

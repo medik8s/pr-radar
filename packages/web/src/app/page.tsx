@@ -96,11 +96,11 @@ export default function Home() {
 
   if (needsAuth) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 text-gray-400">
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-text-secondary">
         <p className="text-sm">No GitHub token available.</p>
         <a
           href="/sign-in"
-          className="rounded bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-700"
+          className="rounded-md bg-accent px-4 py-2 text-sm text-white hover:bg-accent-hover transition-colors"
         >
           Sign in
         </a>
@@ -110,14 +110,14 @@ export default function Home() {
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center text-red-400">
+      <div className="flex h-full items-center justify-center text-status-error">
         {error} — <button onClick={() => void load()} className="ml-2 underline">retry</button>
       </div>
     );
   }
 
   if (results.length === 0 && refreshing) {
-    return <div className="flex h-full items-center justify-center text-gray-500 text-sm">Loading PRs…</div>;
+    return <div className="flex h-full items-center justify-center text-text-muted text-sm">Loading PRs…</div>;
   }
 
   return (
