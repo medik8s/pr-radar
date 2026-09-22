@@ -368,7 +368,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
     let prs = allPrs;
     if (stateFilter.length > 0) prs = prs.filter((p) => stateFilter.includes(p.state));
     if (repoFilter.length > 0) prs = prs.filter((p) => repoFilter.includes(p.repo));
-    const effectiveAuthors = authorFilter.length > 0 ? authorFilter : DEFAULT_AUTHORS;
+    const effectiveAuthors: readonly string[] = authorFilter.length > 0 ? authorFilter : DEFAULT_AUTHORS;
     prs = prs.filter((p) => effectiveAuthors.includes(p.author));
     return applySmartFilter(prs, smartFilter);
   }, [allPrs, stateFilter, repoFilter, authorFilter, smartFilter]);
