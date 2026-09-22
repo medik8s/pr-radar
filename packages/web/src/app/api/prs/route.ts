@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { getCached, setCached, isRevalidating, markRevalidating, fetchRepoPRs, DEFAULT_CONFIG, DEFAULT_AUTHORS } from "@pr-radar/core";
+import { getCached, setCached, isRevalidating, markRevalidating, fetchRepoOpenPRs, DEFAULT_CONFIG, OPEN_PRS_CACHE_KEY } from "@pr-radar/core";
 import type { FetchResult } from "@pr-radar/core";
 
 export const runtime = "nodejs";
@@ -32,10 +32,6 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const forceRefresh = searchParams.get("refresh") === "1";
-  const authorsParam = searchParams.get("authors");
-  const authors: string[] = authorsParam
-    ? authorsParam.split(",").map((a) => a.trim()).filter(Boolean)
-    : [...DEFAULT_AUTHORS];
 
   const reposParam = searchParams.get("repos");
   const customRepos: string[] = reposParam
@@ -51,32 +47,23 @@ export async function GET(req: Request) {
 
   const results = await Promise.all(
     repoConfigs.map(async (repoConfig): Promise<FetchResult> => {
-      const perAuthor = await Promise.all(
-        authors.map(async (author) => {
-          if (!forceRefresh) {
-            const { data, stale } = await getCached(repoConfig.repo, author);
-            if (data && !stale) return data;
-            if (data && stale && !isRevalidating(repoConfig.repo, author)) {
-              markRevalidating(repoConfig.repo, author, true);
-              fetchRepoPRs(token, repoConfig, author)
-                .then((fresh) => setCached(fresh, DEFAULT_CONFIG.cacheTtl, author))
-                .catch(() => {})
-                .finally(() => markRevalidating(repoConfig.repo, author, false));
-              return data;
-            }
-            if (data) return data;
-          }
-          const result = await fetchRepoPRs(token, repoConfig, author);
-          await setCached(result, DEFAULT_CONFIG.cacheTtl, author);
-          return result;
-        }),
-      );
+      if (!forceRefresh) {
+        const { data, stale } = await getCached(repoConfig.repo, OPEN_PRS_CACHE_KEY);
+        if (data && !stale) return data;
+        if (data && stale && !isRevalidating(repoConfig.repo, OPEN_PRS_CACHE_KEY)) {
+          markRevalidating(repoConfig.repo, OPEN_PRS_CACHE_KEY, true);
+          fetchRepoOpenPRs(token, repoConfig)
+            .then((fresh) => setCached(fresh, DEFAULT_CONFIG.cacheTtl, OPEN_PRS_CACHE_KEY))
+            .catch(() => {})
+            .finally(() => markRevalidating(repoConfig.repo, OPEN_PRS_CACHE_KEY, false));
+          return data;
+        }
+        if (data) return data;
+      }
 
-      return {
-        prs: perAuthor.flatMap((r) => r.prs),
-        fetchedAt: perAuthor[0]?.fetchedAt ?? new Date().toISOString(),
-        repo: repoConfig.repo,
-      };
+      const result = await fetchRepoOpenPRs(token, repoConfig);
+      await setCached(result, DEFAULT_CONFIG.cacheTtl, OPEN_PRS_CACHE_KEY);
+      return result;
     }),
   );
 

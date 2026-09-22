@@ -23,13 +23,17 @@ export default function Home() {
     setError(null);
     try {
       const res = await fetch(
-        `/api/prs?authors=${DEFAULT_AUTHORS.join(",")}${force ? "&refresh=1" : ""}`,
+        `/api/prs${force ? "?refresh=1" : ""}`,
       );
       if (res.status === 401) { setNeedsAuth(true); return; }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setNeedsAuth(false);
-      setResults(await res.json() as FetchResult[]);
-      setFetchedAuthors(new Set(DEFAULT_AUTHORS));
+      const incoming = await res.json() as FetchResult[];
+      setResults(incoming);
+      setFetchedAuthors(new Set([
+        ...DEFAULT_AUTHORS,
+        ...incoming.flatMap((result) => result.prs.map((pr) => pr.author)),
+      ]));
       setLoadedRepos(new Set(DEFAULT_REPOS));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
@@ -38,37 +42,9 @@ export default function Home() {
     }
   }, []);
 
-  const loadForAuthors = useCallback(async (newAuthors: string[]) => {
-    const toFetch = newAuthors.filter((a) => !fetchedAuthors.has(a));
-    if (toFetch.length === 0) return;
-
-    setLoadingAuthors((prev) => new Set([...prev, ...toFetch]));
-    try {
-      const res = await fetch(`/api/prs?authors=${toFetch.join(",")}`);
-      if (!res.ok) return;
-      const incoming = await res.json() as FetchResult[];
-      setResults((prev) => {
-        const map = new Map(prev.map((r) => [r.repo, { ...r, prs: [...r.prs] }]));
-        for (const r of incoming) {
-          const existing = map.get(r.repo);
-          if (existing) {
-            const knownIds = new Set(existing.prs.map((p) => p.number));
-            existing.prs.push(...r.prs.filter((p) => !knownIds.has(p.number)));
-          } else {
-            map.set(r.repo, r);
-          }
-        }
-        return Array.from(map.values());
-      });
-      setFetchedAuthors((prev) => new Set([...prev, ...toFetch]));
-    } finally {
-      setLoadingAuthors((prev) => {
-        const next = new Set(prev);
-        toFetch.forEach((a) => next.delete(a));
-        return next;
-      });
-    }
-  }, [fetchedAuthors]);
+  const loadForAuthors = useCallback((newAuthors: string[]) => {
+    setFetchedAuthors((prev) => new Set([...prev, ...newAuthors]));
+  }, []);
 
   const loadForRepos = useCallback(async (newRepos: string[]) => {
     const toFetch = newRepos.filter((r) => !loadedRepos.has(r) && !loadingRepos.has(r));
@@ -76,10 +52,7 @@ export default function Home() {
 
     setLoadingRepos((prev) => new Set([...prev, ...toFetch]));
     try {
-      const authors = Array.from(fetchedAuthors);
-      const res = await fetch(
-        `/api/prs?authors=${authors.join(",")}&repos=${toFetch.join(",")}`,
-      );
+      const res = await fetch(`/api/prs?repos=${toFetch.join(",")}`);
       if (!res.ok) return;
       const incoming = await res.json() as FetchResult[];
       setResults((prev) => {
@@ -95,6 +68,10 @@ export default function Home() {
         }
         return Array.from(map.values());
       });
+      setFetchedAuthors((prev) => new Set([
+        ...prev,
+        ...incoming.flatMap((result) => result.prs.map((pr) => pr.author)),
+      ]));
       setLoadedRepos((prev) => new Set([...prev, ...toFetch]));
     } finally {
       setLoadingRepos((prev) => {
@@ -103,7 +80,7 @@ export default function Home() {
         return next;
       });
     }
-  }, [loadedRepos, loadingRepos, fetchedAuthors]);
+  }, [loadedRepos, loadingRepos]);
 
   useEffect(() => {
     void load();

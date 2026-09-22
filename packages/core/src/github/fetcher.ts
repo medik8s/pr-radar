@@ -298,8 +298,16 @@ export async function fetchRepoPRs(
   repoConfig: AppConfig["repos"][number],
   author: string,
 ): Promise<FetchResult> {
+  return fetchPRs(token, repoConfig, `is:pr repo:${repoConfig.repo} author:${author}`, author);
+}
+
+async function fetchPRs(
+  token: string,
+  repoConfig: AppConfig["repos"][number],
+  searchQuery: string,
+  author?: string,
+): Promise<FetchResult> {
   const client = graphql.defaults({ headers: { authorization: `token ${token}` } });
-  const searchQuery = `is:pr repo:${repoConfig.repo} author:${author}`;
 
   const prs: PullRequest[] = [];
   let cursor: string | null = null;
@@ -318,7 +326,19 @@ export async function fetchRepoPRs(
     pages++;
   } while (cursor && pages < MAX_PAGES);
 
-  return { prs, fetchedAt: new Date().toISOString(), repo: repoConfig.repo, author };
+  return {
+    prs,
+    fetchedAt: new Date().toISOString(),
+    repo: repoConfig.repo,
+    ...(author ? { author } : {}),
+  };
+}
+
+export async function fetchRepoOpenPRs(
+  token: string,
+  repoConfig: AppConfig["repos"][number],
+): Promise<FetchResult> {
+  return fetchPRs(token, repoConfig, `is:pr is:open repo:${repoConfig.repo}`);
 }
 
 export async function fetchRepoPRsForAuthors(
