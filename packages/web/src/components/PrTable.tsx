@@ -316,9 +316,8 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
   const [repoDropdownOpen, setRepoDropdownOpen] = useState(false);
   const [repoInput, setRepoInput] = useState("");
   const repoDropdownRef = useRef<HTMLDivElement>(null);
-  const [authorFilter, setAuthorFilter] = useLocalStorage<string[]>("pr-radar:authorFilter:v2", [...DEFAULT_AUTHORS]);
+  const [authorFilter, setAuthorFilter] = useLocalStorage<string[]>("pr-radar:authorFilter:v3", [...DEFAULT_AUTHORS]);
   const [authorDropdownOpen, setAuthorDropdownOpen] = useState(false);
-  const [authorInput, setAuthorInput] = useState("");
   const authorDropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdowns on outside click
@@ -361,16 +360,8 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
     setRepoInput("");
   }, [repoInput]);
 
-  const addAuthorFromInput = useCallback(() => {
-    const name = authorInput.trim().toLowerCase();
-    if (!name) return;
-    setAuthorFilter((prev) => (prev.includes(name) ? prev : [...prev, name]));
-    setAuthorInput("");
-  }, [authorInput]);
-
   const allPrs = useMemo(() => results.flatMap((r) => r.prs), [results]);
   const repos = useMemo(() => Array.from(new Set(allPrs.map((p) => p.repo))), [allPrs]);
-  const allAuthors = useMemo(() => Array.from(new Set(allPrs.map((p) => p.author))).sort(), [allPrs]);
   const lastFetched = results[0]?.fetchedAt;
 
   const filtered = useMemo(() => {
@@ -532,18 +523,6 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
           </button>
           {authorDropdownOpen && (
             <div className="absolute left-0 top-full z-20 mt-1 min-w-[180px] rounded-lg border border-gray-700 bg-gray-900 py-1 shadow-xl">
-              {/* Text input to add an arbitrary author */}
-              <div className="flex items-center gap-1 border-b border-gray-800 px-2 pb-1">
-                <input
-                  type="text"
-                  value={authorInput}
-                  onChange={(e) => setAuthorInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter") addAuthorFromInput(); }}
-                  placeholder="Add username…"
-                  className="w-full bg-transparent py-1 text-xs text-gray-300 placeholder-gray-600 outline-none"
-                />
-                <button onClick={addAuthorFromInput} className="text-gray-500 hover:text-gray-300 text-xs">+</button>
-              </div>
               <button
                 onClick={() => setAuthorFilter([])}
                 className="w-full px-3 py-1 text-left text-xs text-gray-500 hover:text-gray-300"
@@ -557,8 +536,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                 Reset to defaults
               </button>
               <div className="my-1 border-t border-gray-800" />
-              {/* All known + selected authors */}
-              {Array.from(new Set([...DEFAULT_AUTHORS, ...allAuthors, ...authorFilter])).sort().map((a) => {
+              {DEFAULT_AUTHORS.toSorted().map((a) => {
                 const selected = authorFilter.includes(a);
                 const loading = loadingAuthors.has(a);
                 return (
