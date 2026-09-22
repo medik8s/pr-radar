@@ -539,7 +539,7 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
                 Reset to defaults
               </button>
               <div className="my-1 border-t border-border" />
-              {DEFAULT_AUTHORS.toSorted().map((a) => {
+              {DEFAULT_AUTHORS.toSorted((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })).map((a) => {
                 const selected = authorFilter.includes(a);
                 const loading = loadingAuthors.has(a);
                 return (
