@@ -33,6 +33,15 @@
   --color-status-info-bg: rgba(59, 130, 246, 0.15);
   --color-status-neutral: #a855f7;
   --color-status-neutral-bg: rgba(168, 85, 247, 0.15);
+  --color-status-skipped: #6b7280;
+  --color-status-missing: #4b5563;
+
+  /* Status borders */
+  --color-status-success-border: rgba(34, 197, 94, 0.25);
+  --color-status-error-border: rgba(239, 68, 68, 0.25);
+  --color-status-warning-border: rgba(234, 179, 8, 0.25);
+  --color-status-info-border: rgba(59, 130, 246, 0.25);
+  --color-status-neutral-border: rgba(168, 85, 247, 0.25);
 
   /* Typography */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
@@ -50,6 +59,16 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-bg-hover) var(--color-bg-body);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
 
   ::-webkit-scrollbar {

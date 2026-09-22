@@ -5,8 +5,8 @@ const STATUS_COLORS: Record<string, string> = {
   success: "bg-status-success",
   failure: "bg-status-error",
   pending: "bg-status-warning",
-  skipped: "bg-text-muted",
-  missing: "bg-border",
+  skipped: "bg-status-skipped",
+  missing: "bg-status-missing",
 };
 
 export function CiDots({ jobs }: { jobs: CiJob[] }) {

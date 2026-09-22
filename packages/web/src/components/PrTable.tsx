@@ -27,27 +27,27 @@ const DEFAULT_REPO_FILTER = ALL_DEFAULT_REPOS;
 function removedLabelClasses(label: string): string {
   const l = label.toLowerCase();
   if (/^(lgtm|approved|cherry-pick-approved|ok-to-test)$/.test(l))
-    return "border border-[rgba(34,197,94,0.3)] text-text-muted";
+    return "border border-status-success-border text-text-muted";
   if (/^(hold|do-not-merge|needs-rebase|wip)$/.test(l) || /^do-not-merge\//.test(l))
-    return "border border-[rgba(239,68,68,0.3)] text-text-muted";
+    return "border border-status-error-border text-text-muted";
   if (/^size\//.test(l) || /^(needs-ok-to-test|needs-priority|needs-kind)$/.test(l))
-    return "border border-[rgba(59,130,246,0.3)] text-text-muted";
-  return "border border-[rgba(168,85,247,0.3)] text-text-muted";
+    return "border border-status-info-border text-text-muted";
+  return "border border-status-neutral-border text-text-muted";
 }
 
 function labelClasses(label: string): string {
   const l = label.toLowerCase();
   // Green: approval / positive signals
   if (/^(lgtm|approved|cherry-pick-approved|ok-to-test)$/.test(l))
-    return "bg-status-success-bg text-status-success border border-[rgba(34,197,94,0.25)]";
+    return "bg-status-success-bg text-status-success border border-status-success-border";
   // Red: hard blockers
   if (/^(hold|do-not-merge|needs-rebase|wip)$/.test(l) || /^do-not-merge\//.test(l))
-    return "bg-status-error-bg text-status-error border border-[rgba(239,68,68,0.25)]";
+    return "bg-status-error-bg text-status-error border border-status-error-border";
   // Blue: size tiers and CI-gate labels
   if (/^size\//.test(l) || /^(needs-ok-to-test|needs-priority|needs-kind)$/.test(l))
-    return "bg-status-info-bg text-status-info border border-[rgba(59,130,246,0.25)]";
+    return "bg-status-info-bg text-status-info border border-status-info-border";
   // Default: purple for area, kind, priority, and anything else
-  return "bg-status-neutral-bg text-status-neutral border border-[rgba(168,85,247,0.25)]";
+  return "bg-status-neutral-bg text-status-neutral border border-status-neutral-border";
 }
 
 function abbreviateRepo(full: string): string {
@@ -63,9 +63,9 @@ function abbreviateRepo(full: string): string {
 }
 
 const STATE_BADGE: Record<PrState, string> = {
-  open: "bg-status-success-bg text-status-success border border-[rgba(34,197,94,0.25)]",
+  open: "bg-status-success-bg text-status-success border border-status-success-border",
   draft: "bg-bg-hover text-text-secondary border border-border",
-  closed: "bg-status-neutral-bg text-status-neutral border border-[rgba(168,85,247,0.25)]",
+  closed: "bg-status-neutral-bg text-status-neutral border border-status-neutral-border",
 };
 
 const COLUMN_TIPS: Record<string, string> = {
