@@ -61,7 +61,7 @@ export const DEFAULT_CONFIG: AppConfig = {
       ciPatterns: { e2e: ["pj-rehearse*", "*rehearse*"], ignore: [] },
     },
   ],
-  cacheTtl: Number(process.env["CACHE_TTL"] ?? 300),
+  cacheTtl: Number(process.env["CACHE_TTL"] ?? 900),
 };
 
 // Pattern-matched so we handle org-specific bot names (e.g. qodo-2-for-medik8s)
