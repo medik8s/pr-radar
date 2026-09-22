@@ -15,7 +15,7 @@ export default function Home() {
   const [needsAuth, setNeedsAuth] = useState(false);
   const [fetchedAuthors, setFetchedAuthors] = useState<Set<string>>(new Set(DEFAULT_AUTHORS));
   const [loadingAuthors, setLoadingAuthors] = useState<Set<string>>(new Set());
-  const [loadedRepos, setLoadedRepos] = useState<Set<string>>(new Set());
+  const [loadedRepos, setLoadedRepos] = useState<Set<string>>(new Set(DEFAULT_REPOS));
   const [loadingRepos, setLoadingRepos] = useState<Set<string>>(new Set());
 
   const load = useCallback(async (force = false) => {

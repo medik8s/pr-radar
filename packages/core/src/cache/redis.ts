@@ -4,6 +4,7 @@ import type { FetchResult } from "../types.js";
 interface CacheEntry {
   value: FetchResult;
   storedAt: number;
+  staleAt: number;
   expiresAt: number;
 }
 
@@ -39,8 +40,8 @@ export interface CacheResult {
   stale: boolean;
 }
 
-// Soft TTL: serve data but mark as stale for background refresh (default 15 min)
-const STALE_AFTER = Number(process.env["CACHE_STALE_AFTER"] ?? 900);
+// Keep stale data available when GitHub is unavailable or rate-limited.
+const MAX_AGE = Number(process.env["CACHE_MAX_AGE"] ?? 86400);
 
 export async function getCached(repo: string, author: string): Promise<CacheResult> {
   const key = cacheKey(repo, author);
@@ -49,14 +50,14 @@ export async function getCached(repo: string, author: string): Promise<CacheResu
   if (!isUpstashConfigured()) {
     const entry = memCache.get(key);
     if (!entry || entry.expiresAt < now) return { data: null, stale: false };
-    const stale = now - entry.storedAt > STALE_AFTER * 1000;
+    const stale = entry.staleAt < now;
     return { data: entry.value, stale };
   }
 
   try {
     const raw = await getClient().get<CacheEntry>(key);
     if (!raw) return { data: null, stale: false };
-    const stale = now - raw.storedAt > STALE_AFTER * 1000;
+    const stale = raw.staleAt < now;
     return { data: raw.value, stale };
   } catch {
     return { data: null, stale: false };
@@ -66,14 +67,20 @@ export async function getCached(repo: string, author: string): Promise<CacheResu
 export async function setCached(result: FetchResult, ttl: number, author: string): Promise<void> {
   const key = cacheKey(result.repo, author);
   const now = Date.now();
-  const entry: CacheEntry = { value: result, storedAt: now, expiresAt: now + ttl * 1000 };
+  const maxAge = Math.max(ttl, MAX_AGE);
+  const entry: CacheEntry = {
+    value: result,
+    storedAt: now,
+    staleAt: now + ttl * 1000,
+    expiresAt: now + maxAge * 1000,
+  };
 
   if (!isUpstashConfigured()) {
     memCache.set(key, entry);
     return;
   }
   try {
-    await getClient().set(key, entry, { ex: ttl });
+    await getClient().set(key, entry, { ex: maxAge });
   } catch {
     // non-fatal
   }

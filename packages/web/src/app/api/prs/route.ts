@@ -47,8 +47,10 @@ export async function GET(req: Request) {
 
   const results = await Promise.all(
     repoConfigs.map(async (repoConfig): Promise<FetchResult> => {
+      const cached = await getCached(repoConfig.repo, OPEN_PRS_CACHE_KEY);
+
       if (!forceRefresh) {
-        const { data, stale } = await getCached(repoConfig.repo, OPEN_PRS_CACHE_KEY);
+        const { data, stale } = cached;
         if (data && !stale) return data;
         if (data && stale && !isRevalidating(repoConfig.repo, OPEN_PRS_CACHE_KEY)) {
           markRevalidating(repoConfig.repo, OPEN_PRS_CACHE_KEY, true);
@@ -61,9 +63,14 @@ export async function GET(req: Request) {
         if (data) return data;
       }
 
-      const result = await fetchRepoOpenPRs(token, repoConfig);
-      await setCached(result, DEFAULT_CONFIG.cacheTtl, OPEN_PRS_CACHE_KEY);
-      return result;
+      try {
+        const result = await fetchRepoOpenPRs(token, repoConfig);
+        await setCached(result, DEFAULT_CONFIG.cacheTtl, OPEN_PRS_CACHE_KEY);
+        return result;
+      } catch (error) {
+        if (cached.data) return cached.data;
+        throw error;
+      }
     }),
   );
 
