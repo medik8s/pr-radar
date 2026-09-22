@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { RefreshCw, ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react";
+import { DEFAULT_AUTHORS, DEFAULT_CONFIG } from "@pr-radar/core/config/default";
 import type { PullRequest, PrState, FetchResult } from "@/lib/types";
 import { BotBadge } from "./BotBadge";
 import { CiDots, E2eDot } from "./CiDots";
@@ -19,15 +20,8 @@ import clsx from "clsx";
 
 const col = createColumnHelper<PullRequest>();
 
-const ALL_DEFAULT_REPOS = [
-  "medik8s/system-tests",
-  "openshift/release",
-  "medik8s/storage-based-remediation",
-];
-// sbr deselected by default — user must opt in
-const DEFAULT_REPO_FILTER = ALL_DEFAULT_REPOS.filter(
-  (r) => r !== "medik8s/storage-based-remediation",
-);
+const ALL_DEFAULT_REPOS = DEFAULT_CONFIG.repos.map(({ repo }) => repo);
+const DEFAULT_REPO_FILTER = ALL_DEFAULT_REPOS;
 
 // Returns the border/text color for a removed label (outline only, grey text, strikethrough)
 function removedLabelClasses(label: string): string {
@@ -249,8 +243,6 @@ const COLUMNS = [
   }),
 ];
 
-const DEFAULT_AUTHORS = ["maximunited", "ugreener", "gamado"];
-
 function useLocalStorage<T>(key: string, defaultValue: T): [T, (v: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(() => {
     try {
@@ -320,11 +312,11 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
   const [stateFilter, setStateFilter] = useState<PrState[]>(["open"]);
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const stateDropdownRef = useRef<HTMLDivElement>(null);
-  const [repoFilter, setRepoFilter] = useLocalStorage<string[]>("pr-radar:repoFilter", DEFAULT_REPO_FILTER);
+  const [repoFilter, setRepoFilter] = useLocalStorage<string[]>("pr-radar:repoFilter:v2", DEFAULT_REPO_FILTER);
   const [repoDropdownOpen, setRepoDropdownOpen] = useState(false);
   const [repoInput, setRepoInput] = useState("");
   const repoDropdownRef = useRef<HTMLDivElement>(null);
-  const [authorFilter, setAuthorFilter] = useLocalStorage<string[]>("pr-radar:authorFilter", DEFAULT_AUTHORS);
+  const [authorFilter, setAuthorFilter] = useLocalStorage<string[]>("pr-radar:authorFilter:v2", [...DEFAULT_AUTHORS]);
   const [authorDropdownOpen, setAuthorDropdownOpen] = useState(false);
   const [authorInput, setAuthorInput] = useState("");
   const authorDropdownRef = useRef<HTMLDivElement>(null);
