@@ -368,7 +368,8 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
     let prs = allPrs;
     if (stateFilter.length > 0) prs = prs.filter((p) => stateFilter.includes(p.state));
     if (repoFilter.length > 0) prs = prs.filter((p) => repoFilter.includes(p.repo));
-    if (authorFilter.length > 0) prs = prs.filter((p) => authorFilter.includes(p.author));
+    const effectiveAuthors = authorFilter.length > 0 ? authorFilter : DEFAULT_AUTHORS;
+    prs = prs.filter((p) => effectiveAuthors.includes(p.author));
     return applySmartFilter(prs, smartFilter);
   }, [allPrs, stateFilter, repoFilter, authorFilter, smartFilter]);
 
@@ -527,16 +528,16 @@ export function PrTable({ results, onRefresh, refreshing, fetchedAuthors, loadin
           {authorDropdownOpen && (
             <div className="absolute left-0 top-full z-20 mt-1 min-w-[180px] rounded-lg border border-border bg-bg-card py-1 shadow-xl">
               <button
-                onClick={() => setAuthorFilter([])}
-                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
-              >
-                Show all
-              </button>
-              <button
                 onClick={() => setAuthorFilter([...DEFAULT_AUTHORS])}
                 className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
               >
-                Reset to defaults
+                Select all
+              </button>
+              <button
+                onClick={() => setAuthorFilter([])}
+                className="w-full px-3 py-1 text-left text-xs text-text-muted hover:text-text-primary"
+              >
+                Clear all
               </button>
               <div className="my-1 border-t border-border" />
               {DEFAULT_AUTHORS.toSorted((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })).map((a) => {
