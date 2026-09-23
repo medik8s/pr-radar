@@ -62,6 +62,10 @@ export const DEFAULT_CONFIG: AppConfig = {
       repo: "openshift/release",
       ciPatterns: { e2e: ["pj-rehearse*", "*rehearse*"], ignore: [] },
     },
+    {
+      repo: "openshift/rhwa-system-tests",
+      ciPatterns: { e2e: ["pj-rehearse*", "*e2e*"], ignore: [] },
+    },
   ],
   cacheTtl: Number(process.env["CACHE_TTL"] ?? 900),
 };
