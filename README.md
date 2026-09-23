@@ -33,9 +33,9 @@ Open PR dashboard for medik8s and OpenShift teams. One table with CI status, bot
 
 Configured in `packages/core/src/config/default.ts`:
 
-**Repos (9):** medik8s/fence-agents-remediation, medik8s/self-node-remediation, medik8s/node-healthcheck-operator, medik8s/machine-deletion-remediation, medik8s/node-maintenance-operator, medik8s/storage-based-remediation, medik8s/common, medik8s/system-tests, openshift/release
+**Repos (10):** medik8s/fence-agents-remediation, medik8s/self-node-remediation, medik8s/node-healthcheck-operator, medik8s/machine-deletion-remediation, medik8s/node-maintenance-operator, medik8s/storage-based-remediation, medik8s/common, medik8s/system-tests, openshift/release, openshift/rhwa-system-tests
 
-**Authors (21):** The union of approvers and reviewers from the tracked medik8s repositories' OWNERS and OWNERS\_ALIASES files, plus contributor exceptions.
+**Authors (21):** The union of approvers and reviewers from all tracked repositories' OWNERS and OWNERS\_ALIASES files, plus contributor exceptions.
 
 All configured authors' PRs are fetched on load via one GitHub GraphQL query per repository. Author filtering is applied entirely in the browser.
 
@@ -107,4 +107,4 @@ CI job names matching `e2e` patterns go in the E2E column; everything else goes 
 
 ## Updating default authors
 
-Re-read the tracked medik8s repositories' root `OWNERS` and `OWNERS_ALIASES` files, update `DEFAULT_AUTHORS` in `packages/core/src/config/default.ts`, and preserve only explicitly approved contributor exceptions. Increment the `pr-radar:authorFilter:vN` key in `packages/web/src/components/PrTable.tsx` when existing browsers must receive a changed default list.
+Re-read root `OWNERS` and `OWNERS_ALIASES` files across all tracked repositories (excluding `openshift/release`), update `DEFAULT_AUTHORS` in `packages/core/src/config/default.ts`, and preserve only explicitly approved contributor exceptions. Increment the `pr-radar:authorFilter:vN` key in `packages/web/src/components/PrTable.tsx` when existing browsers must receive a changed default list.
